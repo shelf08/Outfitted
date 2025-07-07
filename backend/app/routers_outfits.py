@@ -18,7 +18,10 @@ def get_outfits(
         query = query.filter(models.Outfit.category_id == category_id)
     total = query.count()
     items = query.offset(offset).limit(limit).all()
-    return {"total": total, "items": items}
+    return {
+        "total": total,
+        "items": [schemas.Outfit.model_validate(item) for item in items]
+    }
 
 # Получить аутфит по id
 @router.get("/{outfit_id}", response_model=schemas.Outfit)

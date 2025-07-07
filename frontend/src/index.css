@@ -18,3 +18,7 @@ code {
   font-weight: 400;
   font-style: normal;
 }
+
+body, html, #root {
+  font-family: 'Alphasano', Arial, sans-serif !important;
+}

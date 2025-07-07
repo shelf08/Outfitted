@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine
 from . import models
 from .routers_users import router as users_router
@@ -7,6 +8,15 @@ from .routers_outfits import router as outfits_router
 from .routers_favorites import router as favorites_router
 
 app = FastAPI(title="Outfitted")
+
+# Добавь CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Base.metadata.create_all(bind=engine)
 app.include_router(users_router)
