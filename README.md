@@ -5,4 +5,4 @@
 - Серверная часть: FastAPI, SQLAlchemy, Pydantic, PostgreSQL, CORS, Swagger
 - Клиентская часть: React, TypeScript, MUI
 
-# Лобцов Дмитрий (shelf08) - Full-stack разработчик
+### Лобцов Дмитрий (shelf08) - Full-stack разработчик
