@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Typography, Tabs, Tab, TextField, Button, Alert } from '@mui/material';
+import { Box, Typography, Tabs, Tab, TextField, Button, Alert, Modal, IconButton } from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import axios from 'axios';
+import AddOutfitForm from '../components/AddOutfitForm';
 
 const API_URL = 'http://localhost:8000';
 
@@ -10,6 +12,8 @@ const Profile: React.FC = () => {
   const [error, setError] = useState('');
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [favorites, setFavorites] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
+  const [showAddOutfit, setShowAddOutfit] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -43,9 +47,21 @@ const Profile: React.FC = () => {
       }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
       localStorage.setItem('token', res.data.access_token);
       setToken(res.data.access_token);
+      fetchUserInfo(res.data.access_token);
       fetchFavorites(res.data.access_token);
     } catch (e: any) {
       setError(e.response?.data?.detail || 'Ошибка входа');
+    }
+  };
+
+  const fetchUserInfo = async (jwt?: string) => {
+    try {
+      const res = await axios.get(`${API_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${jwt || token}` },
+      });
+      setUser(res.data);
+    } catch {
+      setUser(null);
     }
   };
 
@@ -64,10 +80,14 @@ const Profile: React.FC = () => {
     localStorage.removeItem('token');
     setToken('');
     setFavorites([]);
+    setUser(null);
   };
 
   React.useEffect(() => {
-    if (token) fetchFavorites();
+    if (token) {
+      fetchUserInfo();
+      fetchFavorites();
+    }
   }, [token]);
 
   if (!token) {
@@ -97,50 +117,149 @@ const Profile: React.FC = () => {
     );
   }
 
-return (
-  <Box sx={{ position: 'relative', minHeight: 300 }}>
-    {/* Кнопка выйти — в правом верхнем углу */}
-    <Button
-      onClick={handleLogout}
-      sx={{
-        position: 'absolute',
-        top: -30,
-        right: -340,
-        zIndex: 1,
-        mt: { xs: 1, md: 2 },
-        mr: { xs: 1, md: 2 },
-      }}
-      variant="outlined"
-    >
-      Выйти
-    </Button>
-    {/* Основной контент — центр, но ближе к верху */}
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        mt: 2,
-      }}
-    >
-      <Typography variant="h5" gutterBottom>
-        Избранные аутфиты
-      </Typography>
-      {favorites.length === 0 ? (
-        <Typography>Нет избранных аутфитов.</Typography>
-      ) : (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
-          {favorites.map((outfit) => (
-            <Box key={outfit.id} sx={{ width: { xs: '100%', sm: '45%', md: '30%' }, mb: 3 }}>
-              <img src={outfit.image_url} alt={outfit.title} style={{ width: '100%', borderRadius: 8 }} />
-              <Typography variant="h6">{outfit.title}</Typography>
-            </Box>
-          ))}
-        </Box>
+  return (
+    <Box sx={{ position: 'relative', minHeight: 300 }}>
+      {/* Кнопка выйти — в правом верхнем углу */}
+      <Button
+        onClick={handleLogout}
+        sx={{
+          position: 'absolute',
+          top: -30,
+          right: -340,
+          zIndex: 1,
+          mt: { xs: 1, md: 2 },
+          mr: { xs: 1, md: 2 },
+        }}
+        variant="outlined"
+      >
+        Выйти
+      </Button>
+      
+      {/* Кнопка добавления аутфита для администратора */}
+      {user?.is_admin && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setShowAddOutfit(true)}
+          sx={{
+            position: 'absolute',
+            top: -30,
+            right: -200,
+            zIndex: 1,
+            mt: { xs: 1, md: 2 },
+            mr: { xs: 1, md: 2 },
+          }}
+        >
+          Добавить аутфит
+        </Button>
       )}
+      
+      {/* Основной контент — центр, но ближе к верху */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          mt: 2,
+        }}
+      >
+        <Typography variant="h5" gutterBottom>
+          Избранные аутфиты
+        </Typography>
+        {favorites.length === 0 ? (
+          <Typography>Нет избранных аутфитов.</Typography>
+        ) : (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
+            {favorites.map((outfit) => (
+              <Box
+                key={outfit.id}
+                sx={{
+                  width: { xs: '100%', sm: '45%', md: '30%' },
+                  mb: 3,
+                  position: 'relative',
+                  bgcolor: 'background.paper',
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  border: '1.5px solid #bbb',
+                  p: 2,
+                  transition: 'box-shadow 0.2s',
+                  '&:hover': {
+                    boxShadow: 6,
+                    borderColor: '#888',
+                  },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <img
+                  src={outfit.image_url}
+                  alt={outfit.title}
+                  style={{ width: '100%', borderRadius: 8, marginBottom: 12 }}
+                />
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
+                  {outfit.title}
+                </Typography>
+                <IconButton
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      await axios.delete(`${API_URL}/favorites/${outfit.id}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                      });
+                      setFavorites((prev) => prev.filter((f) => f.id !== outfit.id));
+                    } catch {
+                      // Можно добавить обработку ошибки
+                    }
+                  }}
+                  sx={{
+                    position: 'absolute',
+                    bottom: 18,
+                    right: 18,
+                    background: 'white',
+                    borderRadius: '50%',
+                    boxShadow: 1,
+                    p: '2px',
+                    '&:hover': { background: '#ffeaea' },
+                  }}
+                >
+                  <FavoriteIcon color="error" sx={{ fontSize: 32 }} />
+                </IconButton>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
+      
+      {/* Модальное окно для добавления аутфита */}
+      <Modal
+        open={showAddOutfit}
+        onClose={() => setShowAddOutfit(false)}
+        aria-labelledby="add-outfit-modal"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: 800,
+          maxHeight: '90vh',
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 24,
+          overflow: 'auto'
+        }}>
+          <AddOutfitForm
+            onClose={() => setShowAddOutfit(false)}
+            onSuccess={() => {
+              // Можно добавить обновление списка аутфитов если нужно
+            }}
+          />
+        </Box>
+      </Modal>
     </Box>
-  </Box>
-);
+  );
 };
 
 export default Profile; 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Box, Card, CardMedia, CardContent, Typography, Pagination } from '@mui/material';
+import { Box, Typography, Pagination, Grid } from '@mui/material';
 
 const API_URL = 'http://localhost:8000';
 const limit = 12;
@@ -24,29 +24,47 @@ const Outfits: React.FC = () => {
   return (
     <Box>
       <Typography variant="h5" gutterBottom>Каталог аутфитов</Typography>
-      <Box display="flex" flexWrap="wrap" gap={3} justifyContent="center">
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 4,
+          justifyContent: 'center',
+          alignItems: 'start',
+          mt: 2,
+        }}
+      >
         {outfits.map((outfit) => (
-          <Box key={outfit.id} sx={{ width: { xs: '100%', sm: '45%', md: '30%' }, mb: 3, cursor: 'pointer' }} onClick={() => navigate(`/outfits/${outfit.id}`)}>
-            <Card sx={{ border: '1.5px solid black' }}>
-              <Box sx={{ p: '3px' }}>
-                <CardMedia
-                  component="img"
-                  image={outfit.image_url}
-                  alt={outfit.title}
-                  sx={{
-                    width: '100%',
-                    height: 320,
-                    objectFit: 'cover',
-                    border: '1px solid black',
-                    borderRadius: 2,
-                    background: '#fff'
-                  }}
-                />
-              </Box>
-              <CardContent>
-                <Typography variant="h6">{outfit.title}</Typography>
-              </CardContent>
-            </Card>
+          <Box
+            key={outfit.id}
+            sx={{
+              maxWidth: 340,
+              minWidth: 260,
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              boxShadow: 2,
+              border: '1.5px solid #bbb',
+              p: 2,
+              transition: 'box-shadow 0.2s',
+              '&:hover': {
+                boxShadow: 6,
+                borderColor: '#888',
+              },
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'pointer',
+            }}
+            onClick={() => navigate(`/outfits/${outfit.id}`)}
+          >
+            <img
+              src={outfit.image_url}
+              alt={outfit.title}
+              style={{ width: '100%', borderRadius: 8, marginBottom: 12 }}
+            />
+            <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
+              {outfit.title}
+            </Typography>
           </Box>
         ))}
       </Box>

@@ -42,6 +42,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+    is_admin: bool
     favorites: List[Outfit] = []
     class Config:
         from_attributes = True 

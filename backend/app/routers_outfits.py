@@ -31,9 +31,13 @@ def get_outfit(outfit_id: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Outfit not found")
     return outfit
 
-# Создать аутфит (только авторизованный)
+# Создать аутфит (только администратор)
 @router.post("/", response_model=schemas.Outfit)
 def create_outfit(outfit: schemas.OutfitBase, db: Session = Depends(database.get_db), user=Depends(auth.get_current_user)):
+    # Проверяем, является ли пользователь администратором
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Only administrators can create outfits")
+    
     items = []
     for item_data in outfit.items:
         item = models.Item(name=item_data.name, brand=item_data.brand, model=item_data.model)
@@ -52,9 +56,13 @@ def create_outfit(outfit: schemas.OutfitBase, db: Session = Depends(database.get
     db.refresh(new_outfit)
     return new_outfit
 
-# Обновить аутфит (только авторизованный)
+# Обновить аутфит (только администратор)
 @router.put("/{outfit_id}", response_model=schemas.Outfit)
 def update_outfit(outfit_id: int, outfit: schemas.OutfitBase, db: Session = Depends(database.get_db), user=Depends(auth.get_current_user)):
+    # Проверяем, является ли пользователь администратором
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Only administrators can update outfits")
+    
     db_outfit = db.query(models.Outfit).filter(models.Outfit.id == outfit_id).first()
     if not db_outfit:
         raise HTTPException(status_code=404, detail="Outfit not found")
@@ -73,9 +81,13 @@ def update_outfit(outfit_id: int, outfit: schemas.OutfitBase, db: Session = Depe
     db.refresh(db_outfit)
     return db_outfit
 
-# Удалить аутфит (только авторизованный)
+# Удалить аутфит (только администратор)
 @router.delete("/{outfit_id}")
 def delete_outfit(outfit_id: int, db: Session = Depends(database.get_db), user=Depends(auth.get_current_user)):
+    # Проверяем, является ли пользователь администратором
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Only administrators can delete outfits")
+    
     db_outfit = db.query(models.Outfit).filter(models.Outfit.id == outfit_id).first()
     if not db_outfit:
         raise HTTPException(status_code=404, detail="Outfit not found")
