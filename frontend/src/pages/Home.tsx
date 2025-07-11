@@ -1,58 +1,151 @@
-import React from 'react';
-import { Box, Typography, Card, CardMedia, CardContent } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Box, Typography } from '@mui/material';
 
-const demoOutfits = [
-  { id: 1, title: 'Весенний образ', image: 'https://via.placeholder.com/300x400?text=Outfit+1' },
-  { id: 2, title: 'Городской стиль', image: 'https://via.placeholder.com/300x400?text=Outfit+2' },
-  { id: 3, title: 'Вечерний выход', image: 'https://via.placeholder.com/300x400?text=Outfit+3' },
-];
+const API_URL = 'http://localhost:8000';
 
-const Home: React.FC = () => (
-  <Box>
-    {/* Видео */}
-    <Box
-      sx={{
-        width: '99vw',
-        position: 'relative',
-        left: '50%',
-        right: '50%',
-        marginLeft: 'calc(-50vw + 9px)',
-        marginRight: '-50vw',
-        mt: '-28px',
-        mb: '10px',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-      }}
-    >
-      <video
-        src="/videos/main_video.mp4"
-        style={{
+const Home: React.FC = () => {
+  const [outfits, setOutfits] = useState<any[]>([]);
+
+  useEffect(() => {
+    axios
+      .get(`${API_URL}/outfits/?limit=3`)
+      .then(res => setOutfits(res.data.items));
+  }, []);
+
+  return (
+    <Box>
+      {/* Видео */}
+      <Box
+        sx={{
           width: '99vw',
-          height: 'auto',
-          display: 'block',
-          borderRadius: 12,
-          margin: 0,
+          position: 'relative',
+          left: '50%',
+          right: '50%',
+          marginLeft: 'calc(-50vw + 9px)',
+          marginRight: '-50vw',
+          mt: '-28px',
+          mb: '10px',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
         }}
-        autoPlay
-        loop
-        muted
-      />
-    </Box>
-    {/* 3 аутфита */}
-    <Typography variant="h5" gutterBottom>Подборки дня</Typography>
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
-      {demoOutfits.map((outfit) => (
-        <Box key={outfit.id} sx={{ width: { xs: '100%', sm: '45%', md: '30%' }, mb: 3 }}>
-          <Card>
-            <CardMedia component="img" height="320" image={outfit.image} alt={outfit.title} />
-            <CardContent>
-              <Typography variant="h6">{outfit.title}</Typography>
-            </CardContent>
-          </Card>
+      >
+        <video
+          src="/videos/main_video.mp4"
+          style={{
+            width: '99vw',
+            height: 'auto',
+            display: 'block',
+            borderRadius: 12,
+            margin: 0,
+          }}
+          autoPlay
+          loop
+          muted
+        />
+      </Box>
+      {/* 3 аутфита из базы */}
+      <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 800, mt: '100px', fontSize: '35px' }}>Подборка дня</Typography>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 4,
+          justifyContent: 'center',
+          alignItems: 'start',
+          mt: '30px',
+        }}
+      >
+        {outfits.map((outfit) => (
+          <Box
+            key={outfit.id}
+            sx={{
+              maxWidth: 340,
+              minWidth: 260,
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              boxShadow: 2,
+              border: '1.5px solid #bbb',
+              p: 2,
+              transition: 'box-shadow 0.2s',
+              '&:hover': {
+                boxShadow: 6,
+                borderColor: '#888',
+              },
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'pointer',
+            }}
+            // Можно добавить переход на страницу аутфита, если нужно
+            // onClick={() => navigate(`/outfits/${outfit.id}`)}
+          >
+            <img
+              src={outfit.image_url}
+              alt={outfit.title}
+              style={{ width: '100%', borderRadius: 8, marginBottom: 12 }}
+            />
+            <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
+              {outfit.title}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+      {/* Блок с описанием сервиса */}
+      <Box sx={{ mt: '120px', mb: '30px', textAlign: 'center'}}>
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: 700  }}>
+          Outfitted — это современный сервис для поиска и вдохновения стильными образами.
+        </Typography>
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: 700  }}>
+          Мы объединяем лучшие аутфиты и делаем моду доступной каждому.
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700  }}>
+          Добавляйте понравившиеся образы в избранное и делитесь ими с друзьями!
+        </Typography>
+      </Box>
+      {/* Новый раздел с аватарками */}
+      <Box sx={{ mt: '50px', mb: '100px' }}>
+        
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 700, mt: '100px' }}>
+          Нас рекомендают
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '225px',
+            mt: '30px',
+          }}
+        >
+          {[
+            { name: 'Kizaru', img: '/images/team/kizaru.png' },
+            { name: 'Friendly Thug 52 NGG', img: '/images/team/friendlythug.png' },
+            { name: 'Hugo Loud', img: '/images/team/hugoloud.png' },
+          ].map((person) => (
+            <Box key={person.name} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Box
+                component="img"
+                src={person.img}
+                alt={person.name}
+                sx={{
+                  width: 200,
+                  height: 200,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '4px solid #222',
+                  mb: 2,
+                  background: '#2ecc40', // зелёный фон если нет фото
+                }}
+              />
+              <Typography variant="subtitle1" align="center" sx={{ fontWeight: 700, fontSize: '20px' }}>
+                {person.name}
+              </Typography>
+            </Box>
+          ))}
         </Box>
-      ))}
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 export default Home; 

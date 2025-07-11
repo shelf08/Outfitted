@@ -3,6 +3,7 @@ import { Box, Typography, Tabs, Tab, TextField, Button, Alert, Modal, IconButton
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import axios from 'axios';
 import AddOutfitForm from '../components/AddOutfitForm';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:8000';
 
@@ -14,6 +15,7 @@ const Profile: React.FC = () => {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [showAddOutfit, setShowAddOutfit] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -129,8 +131,10 @@ const Profile: React.FC = () => {
           zIndex: 1,
           mt: { xs: 1, md: 2 },
           mr: { xs: 1, md: 2 },
+          ml: 2,
         }}
         variant="outlined"
+        color="error"
       >
         Выйти
       </Button>
@@ -139,15 +143,18 @@ const Profile: React.FC = () => {
       {user?.is_admin && (
         <Button
           variant="contained"
-          color="primary"
           onClick={() => setShowAddOutfit(true)}
           sx={{
             position: 'absolute',
             top: -30,
-            right: -200,
+            right: -240,
             zIndex: 1,
             mt: { xs: 1, md: 2 },
             mr: { xs: 1, md: 2 },
+            backgroundColor: '#111',
+            color: '#fff',
+            fontWeight: 700,
+            '&:hover': { backgroundColor: '#333' },
           }}
         >
           Добавить аутфит
@@ -173,6 +180,7 @@ const Profile: React.FC = () => {
             {favorites.map((outfit) => (
               <Box
                 key={outfit.id}
+                onClick={() => navigate(`/outfits/${outfit.id}`)}
                 sx={{
                   width: { xs: '100%', sm: '45%', md: '30%' },
                   mb: 3,
@@ -183,6 +191,7 @@ const Profile: React.FC = () => {
                   border: '1.5px solid #bbb',
                   p: 2,
                   transition: 'box-shadow 0.2s',
+                  cursor: 'pointer',
                   '&:hover': {
                     boxShadow: 6,
                     borderColor: '#888',
@@ -192,39 +201,40 @@ const Profile: React.FC = () => {
                   alignItems: 'center',
                 }}
               >
-                <img
-                  src={outfit.image_url}
-                  alt={outfit.title}
-                  style={{ width: '100%', borderRadius: 8, marginBottom: 12 }}
-                />
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
+                <Box sx={{ position: 'relative', width: '100%' }}>
+                  <img
+                    src={outfit.image_url}
+                    alt={outfit.title}
+                    style={{ width: '100%', borderRadius: 8, marginBottom: 12 }}
+                  />
+                  <IconButton
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        await axios.delete(`${API_URL}/favorites/${outfit.id}`, {
+                          headers: { Authorization: `Bearer ${token}` },
+                        });
+                        setFavorites((prev) => prev.filter((f) => f.id !== outfit.id));
+                      } catch {
+                        // Можно добавить обработку ошибки
+                      }
+                    }}
+                    color="error"
+                    sx={{
+                      position: 'absolute',
+                      right: 1,
+                      bottom: 10,
+                      background: '#fff',
+                      boxShadow: 2,
+                      '&:hover': { background: '#ffeaea' },
+                    }}
+                  >
+                    <FavoriteIcon />
+                  </IconButton>
+                </Box>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 700, textAlign: 'center' }}>
                   {outfit.title}
                 </Typography>
-                <IconButton
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    try {
-                      await axios.delete(`${API_URL}/favorites/${outfit.id}`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                      });
-                      setFavorites((prev) => prev.filter((f) => f.id !== outfit.id));
-                    } catch {
-                      // Можно добавить обработку ошибки
-                    }
-                  }}
-                  sx={{
-                    position: 'absolute',
-                    bottom: 18,
-                    right: 18,
-                    background: 'white',
-                    borderRadius: '50%',
-                    boxShadow: 1,
-                    p: '2px',
-                    '&:hover': { background: '#ffeaea' },
-                  }}
-                >
-                  <FavoriteIcon color="error" sx={{ fontSize: 32 }} />
-                </IconButton>
               </Box>
             ))}
           </Box>

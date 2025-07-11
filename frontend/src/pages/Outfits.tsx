@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Pagination, Grid } from '@mui/material';
+import { Box, Typography, Pagination} from '@mui/material';
 
 const API_URL = 'http://localhost:8000';
 const limit = 12;
@@ -23,21 +23,21 @@ const Outfits: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom>Каталог аутфитов</Typography>
+      <Typography variant="h5" align="center"  gutterBottom sx={{ fontWeight: 800, fontSize: '35px', mt: '20px' }}> Каталог аутфитов</Typography>
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: 4,
           justifyContent: 'center',
-          alignItems: 'start',
-          mt: 2,
+          alignItems: 'start'
         }}
       >
         {outfits.map((outfit) => (
           <Box
             key={outfit.id}
             sx={{
+              mt: '30px',
               maxWidth: 340,
               minWidth: 260,
               bgcolor: 'background.paper',

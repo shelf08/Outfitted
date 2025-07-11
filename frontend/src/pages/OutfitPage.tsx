@@ -102,10 +102,22 @@ const OutfitPage: React.FC = () => {
     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, alignItems: 'flex-start', mt: 2 }}>
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <img src={outfit.image_url} alt={outfit.title} style={{ width: '100%', maxWidth: 500, borderRadius: 12 }} />
-        <Button onClick={() => navigate(-1)} sx={{ mt: 2 }}>Назад</Button>
+        <Button
+          onClick={() => navigate(-1)}
+          sx={{
+            mt: 2,
+            backgroundColor: '#111',
+            color: '#fff',
+            fontWeight: 700,
+            '&:hover': { backgroundColor: '#333' },
+          }}
+          variant="contained"
+        >
+          Назад
+        </Button>
       </Box>
       <Box sx={{ flex: 1, minWidth: 300 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, justifyContent: 'flex-end' }}>
           <Typography variant="h4" sx={{ flexGrow: 1 }}>{outfit.title}</Typography>
           {token && (
             <IconButton onClick={handleFavorite} color={isFavorite ? 'error' : 'default'}>
@@ -114,7 +126,17 @@ const OutfitPage: React.FC = () => {
           )}
           {user?.is_admin && (
             <>
-              <Button variant="contained" color="primary" onClick={handleEdit} sx={{ ml: 2 }}>
+              <Button
+                variant="contained"
+                onClick={handleEdit}
+                sx={{
+                  ml: 2,
+                  backgroundColor: '#111',
+                  color: '#fff',
+                  fontWeight: 700,
+                  '&:hover': { backgroundColor: '#333' },
+                }}
+              >
                 Редактировать
               </Button>
               <Button variant="outlined" color="error" onClick={handleDelete} sx={{ ml: 2 }}>
