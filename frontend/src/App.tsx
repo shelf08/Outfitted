@@ -6,6 +6,8 @@ import Outfits from './pages/Outfits';
 import Profile from './pages/Profile';
 import OutfitPage from './pages/OutfitPage';
 import logo from './images/logo1.png';
+import tgIcon from './images/tg.png';
+import instIcon from './images/inst.png';
 import './App.css';
 
 function App() {
@@ -66,9 +68,17 @@ function App() {
             <Typography variant="body2" sx={{ fontFamily: 'Alphasano, Arial, sans-serif', fontWeight: 400 }}>
               Outfitted © 2025
             </Typography>
-            <Typography variant="body2" sx={{ fontFamily: 'Alphasano, Arial, sans-serif', fontWeight: 400 }}>
-              Телефон: +7 (914) 803-42-48
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <a href="https://t.me/shelf08" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', marginRight: 30 }}>
+                <img src={tgIcon} alt="Telegram" style={{ width: 28, height: 28 }} />
+              </a>
+              <a href="https://www.instagram.com/shelf08/" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', marginRight: 30 }}>
+                <img src={instIcon} alt="Instagram" style={{ width: 28, height: 28 }} />
+              </a>
+              <Typography variant="body2" sx={{ fontFamily: 'Alphasano, Arial, sans-serif', fontWeight: 400 }}>
+                Телефон: +7 (914) 803-42-48
+              </Typography>
+            </Box>
           </Toolbar>
         </AppBar>
       </Box>

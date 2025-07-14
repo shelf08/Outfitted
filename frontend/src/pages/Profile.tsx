@@ -92,6 +92,11 @@ const Profile: React.FC = () => {
     }
   }, [token]);
 
+  const usernameValid = /^[a-zA-Z0-9]{4,24}$/.test(form.username);
+  const passwordValid = /^[a-zA-Z0-9]{4,24}$/.test(form.password);
+  const emailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email);
+  const isFormValid = usernameValid && passwordValid && emailValid;
+
   if (!token) {
     return (
       <Box maxWidth={400} mx="auto">
@@ -109,10 +114,35 @@ const Profile: React.FC = () => {
           </Box>
         ) : (
           <Box display="flex" flexDirection="column" gap={2}>
-            <TextField label="Имя пользователя" name="username" value={form.username} onChange={handleChange} fullWidth />
-            <TextField label="Email" name="email" value={form.email} onChange={handleChange} fullWidth />
-            <TextField label="Пароль" name="password" type="password" value={form.password} onChange={handleChange} fullWidth />
-            <Button variant="contained" onClick={handleRegister}>Зарегистрироваться</Button>
+            <TextField
+              label="Имя пользователя"
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              fullWidth
+              error={form.username !== '' && !usernameValid}
+              helperText={form.username !== '' && !usernameValid ? "Только латинские буквы и цифры, 4-24 символа" : ""}
+            />
+            <TextField
+              label="Email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              fullWidth
+              error={form.email !== '' && !emailValid}
+              helperText={form.email !== '' && !emailValid ? "Введите корректный email" : ""}
+            />
+            <TextField
+              label="Пароль"
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              fullWidth
+              error={form.password !== '' && !passwordValid}
+              helperText={form.password !== '' && !passwordValid ? "Только латинские буквы и цифры, 4-24 символа" : ""}
+            />
+            <Button variant="contained" onClick={handleRegister} disabled={!isFormValid}>Зарегистрироваться</Button>
           </Box>
         )}
       </Box>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Pagination} from '@mui/material';
+import { Box, Typography, Pagination, Button, Stack } from '@mui/material';
 
 const API_URL = 'http://localhost:8000';
 const limit = 12;
@@ -10,20 +10,67 @@ const Outfits: React.FC = () => {
   const [outfits, setOutfits] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    axios.get(`${API_URL}/categories/`).then(res => setCategories(res.data));
+  }, []);
+
+  useEffect(() => {
+    const params: any = { limit, offset: (page - 1) * limit };
+    if (selectedCategory) params.category_id = selectedCategory;
     axios
-      .get(`${API_URL}/outfits/?limit=${limit}&offset=${(page - 1) * limit}`)
+      .get(`${API_URL}/outfits/`, { params })
       .then(res => {
         setOutfits(res.data.items);
         setTotal(res.data.total);
       });
-  }, [page]);
+  }, [page, selectedCategory]);
 
   return (
     <Box>
       <Typography variant="h5" align="center"  gutterBottom sx={{ fontWeight: 800, fontSize: '35px', mt: '20px' }}> Каталог аутфитов</Typography>
+      <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 2 }}>
+        <Button
+          variant={selectedCategory === null ? 'contained' : 'outlined'}
+          onClick={() => { setSelectedCategory(null); setPage(1); }}
+          sx={{
+            fontFamily: 'Alphasano, Arial, sans-serif',
+            bgcolor: selectedCategory === null ? '#111' : 'transparent',
+            color: selectedCategory === null ? '#fff' : '#111',
+            borderColor: '#111',
+            '&:hover': {
+              bgcolor: '#222',
+              color: '#fff',
+              borderColor: '#111',
+            },
+          }}
+        >
+          Все
+        </Button>
+        {categories.map((cat: any) => (
+          <Button
+            key={cat.id}
+            variant={selectedCategory === cat.id ? 'contained' : 'outlined'}
+            onClick={() => { setSelectedCategory(cat.id); setPage(1); }}
+            sx={{
+              fontFamily: 'Alphasano, Arial, sans-serif',
+              bgcolor: selectedCategory === cat.id ? '#111' : 'transparent',
+              color: selectedCategory === cat.id ? '#fff' : '#111',
+              borderColor: '#111',
+              '&:hover': {
+                bgcolor: '#222',
+                color: '#fff',
+                borderColor: '#111',
+              },
+            }}
+          >
+            {cat.name}
+          </Button>
+        ))}
+      </Stack>
       <Box
         sx={{
           display: 'grid',
