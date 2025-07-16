@@ -232,35 +232,50 @@ const Profile: React.FC = () => {
                 }}
               >
                 <Box sx={{ position: 'relative', width: '100%' }}>
-                  <img
-                    src={outfit.image_url}
-                    alt={outfit.title}
-                    style={{ width: '100%', borderRadius: 8, marginBottom: 12 }}
-                  />
-                  <IconButton
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      try {
-                        await axios.delete(`${API_URL}/favorites/${outfit.id}`, {
-                          headers: { Authorization: `Bearer ${token}` },
-                        });
-                        setFavorites((prev) => prev.filter((f) => f.id !== outfit.id));
-                      } catch {
-                        // Можно добавить обработку ошибки
-                      }
-                    }}
-                    color="error"
+                  <Box
                     sx={{
-                      position: 'absolute',
-                      right: 1,
-                      bottom: 10,
+                      width: 300,
+                      height: 300,
+                      mb: 2,
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       background: '#fff',
-                      boxShadow: 2,
-                      '&:hover': { background: '#ffeaea' },
+                      position: 'relative',
                     }}
                   >
-                    <FavoriteIcon />
-                  </IconButton>
+                    <img
+                      src={outfit.image_url}
+                      alt={outfit.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff', borderRadius: 8 }}
+                    />
+                    <IconButton
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await axios.delete(`${API_URL}/favorites/${outfit.id}`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                          });
+                          setFavorites((prev) => prev.filter((f) => f.id !== outfit.id));
+                        } catch {
+                          // Можно добавить обработку ошибки
+                        }
+                      }}
+                      color="error"
+                      sx={{
+                        position: 'absolute',
+                        right: 1,
+                        bottom: 10,
+                        background: '#fff',
+                        boxShadow: 2,
+                        '&:hover': { background: '#ffeaea' },
+                      }}
+                    >
+                      <FavoriteIcon />
+                    </IconButton>
+                  </Box>
                 </Box>
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 700, textAlign: 'center' }}>
                   {outfit.title}

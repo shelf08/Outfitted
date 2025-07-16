@@ -33,7 +33,7 @@ function App() {
         </AppBar>
 
         {/* Контент */}
-        <Container sx={{ flex: 1, mt: 4, mb: 0 }}>
+        <Container sx={{ flex: 1, mt: 4, mb: 3 }}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/outfits" element={<Outfits />} />

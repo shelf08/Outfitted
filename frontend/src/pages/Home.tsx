@@ -80,11 +80,25 @@ const Home: React.FC = () => {
             // Можно добавить переход на страницу аутфита, если нужно
             // onClick={() => navigate(`/outfits/${outfit.id}`)}
           >
-            <img
-              src={outfit.image_url}
-              alt={outfit.title}
-              style={{ width: '100%', borderRadius: 8, marginBottom: 12 }}
-            />
+            <Box
+              sx={{
+                width: 300,
+                height: 300,
+                mb: 2,
+                borderRadius: 2,
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#fff',
+              }}
+            >
+              <img
+                src={outfit.image_url}
+                alt={outfit.title}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#fff', borderRadius: 8 }}
+              />
+            </Box>
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
               {outfit.title}
             </Typography>

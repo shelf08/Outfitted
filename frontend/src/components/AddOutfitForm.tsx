@@ -32,10 +32,10 @@ const AddOutfitForm: React.FC<AddOutfitFormProps> = ({ onClose, onSuccess, outfi
   const [form, setForm] = useState({
     title: '',
     description: '',
-    image_url: '',
     category_id: '',
     items: [{ name: '', brand: '', model: '' }]
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -46,7 +46,6 @@ const AddOutfitForm: React.FC<AddOutfitFormProps> = ({ onClose, onSuccess, outfi
       setForm({
         title: outfit.title || '',
         description: outfit.description || '',
-        image_url: outfit.image_url || '',
         category_id: outfit.category?.id?.toString() || outfit.category_id?.toString() || '',
         items: outfit.items?.length > 0 ? outfit.items.map((item: any) => ({
           name: item.name || '',
@@ -92,35 +91,42 @@ const AddOutfitForm: React.FC<AddOutfitFormProps> = ({ onClose, onSuccess, outfi
     setForm({ ...form, items: newItems });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async () => {
     setError('');
     setSuccess('');
-
-    if (!form.title || !form.category_id) {
-      setError('Заполните обязательные поля');
+    if (!form.title || !form.category_id || !imageFile) {
+      setError('Заполните обязательные поля и выберите фото');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       if (outfit) {
-        // Режим редактирования
-        await axios.put(`${API_URL}/outfits/${outfit.id}`, {
-          ...form,
-          category_id: parseInt(form.category_id),
-          items: form.items.filter(item => item.name.trim() !== '')
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setSuccess('Аутфит успешно обновлен!');
+        // Режим редактирования (оставим на потом)
+        setError('Редактирование с фото пока не поддерживается');
+        return;
       } else {
         // Режим добавления
-        await axios.post(`${API_URL}/outfits/`, {
-          ...form,
-          category_id: parseInt(form.category_id),
-          items: form.items.filter(item => item.name.trim() !== '')
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
+        const formData = new FormData();
+        formData.append('title', form.title);
+        formData.append('description', form.description);
+        formData.append('category_id', form.category_id);
+        formData.append('image', imageFile);
+        form.items.filter(item => item.name.trim() !== '').forEach((item, idx) => {
+          formData.append(`items[${idx}][name]`, item.name);
+          formData.append(`items[${idx}][brand]`, item.brand);
+          formData.append(`items[${idx}][model]`, item.model);
+        });
+        await axios.post(`${API_URL}/outfits/`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
         });
         setSuccess('Аутфит успешно добавлен!');
       }
@@ -129,7 +135,7 @@ const AddOutfitForm: React.FC<AddOutfitFormProps> = ({ onClose, onSuccess, outfi
         onClose();
       }, 2000);
     } catch (error: any) {
-      setError(error.response?.data?.detail || (outfit ? 'Ошибка при обновлении аутфита' : 'Ошибка при добавлении аутфита'));
+      setError(error.response?.data?.detail || 'Ошибка при добавлении аутфита');
     }
   };
 
@@ -161,13 +167,19 @@ const AddOutfitForm: React.FC<AddOutfitFormProps> = ({ onClose, onSuccess, outfi
           fullWidth
         />
         
-        <TextField
-          label="URL изображения"
-          name="image_url"
-          value={form.image_url}
-          onChange={handleChange}
-          fullWidth
-        />
+        <Button
+          variant="outlined"
+          component="label"
+          sx={{ textAlign: 'left' }}
+        >
+          {imageFile ? imageFile.name : 'Загрузить фото *'}
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleFileChange}
+          />
+        </Button>
         
         <FormControl fullWidth>
           <InputLabel>Категория *</InputLabel>
